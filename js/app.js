@@ -12,118 +12,138 @@ $(document).ready(function(){
   		$(".overlay").fadeOut(200);
   	});
 
-
+  	/*--- DECLARE VARIABLES ---*/
+	var guess;
+  	var compareToChosen;
+  	var numGuesses = 0;
   	var number;
-  	var guess;
   	
+	/*--- FUNCTION TO CLEAR INPUT FORM ---*/
+  	var clearForm = function() {
+  		$("#userGuess").val('').focusout();
+  	};
 
+  	var resetHeader = function () {
+	  	$("#feedback").text("Make your Guess!");
+	  	$("h2").css({background: "#B36604"}, 1000, function(){});  		
+  	};
+
+	/*--- APP CHOOSES A NUMBER BETWEEN 1-100 ---*/
+	var chooseNumber = function() {
+		number = Math.floor((Math.random()*100 +1));
+	};
+	chooseNumber();
+
+  	/*--- FUNCTION TO COLLECT USER'S INPUT ---*/
+	$("#guessButton").click( function() {
+		
+		guess = +$("#userGuess").val();
+		
+		if (guess=="" || guess > 100) {
+			alert("Please enter a number between 1-100. Thanks!");
+			clearForm();
+		}
+		else if (isNaN(guess)) {
+			alert("Please only enter numeric digits. No letters. No decimals. Thanks!");
+			clearForm();
+		}
+		else if (guess % 1 != 0) {
+			alert("Please no numbers with decimals. Thanks!");
+			clearForm();
+		}
+		else {
+			compareToChosen(userGuess);
+			increaseCount();
+			listGuess();
+			clearForm();
+		};
+	});
+
+	$("form").submit(function (e) {
+		 return false;
+		 e.preventDefault();
+	});
+
+  	/*--- ALLOW ENTERY WITH ENTER KEY ---*/
+	$("userGuess").keydown(function (e) {
+		if (e.keyCode == 13) { 
+			e.preventDefault();
+			$("#guessButton").click();
+		}
+	});
+
+	/*--- INCRESE GUESS COUNT ---*/
+	var increaseCount = function () {
+		numGuesses++;
+		$("#count").text(numGuesses);
+	};
+
+	/*--- LIST GUESSES ---*/
+	var listGuess = function () {
+		$("#guessList").append("<li>" + guess + "</li>");
+	};
+
+	/*--- CHANGE HEADER BASED ON USER'S GUESS ---*/
   	var changeHeader = function(text, color) {
   		$("#feedback").text(text);
   		$("h2").css("background", color);
+  		setTimeout(resetHeader,2000);
   	}
 
-// NEWGAME FUNCTION
-	var newGame = function() {
-		var numGuesses = 0;
-		var number = Math.floor((Math.random()*100 +1));
-		alert("the number is " + number);
-
-		$("#guessButton").on("click", function() {
-			event.preventDefault();
-
-			numGuesses++;
-			$("#count").text(numGuesses);
-
-			guess = +$("#userGuess").val();
-			var diff = Math.abs(guess - number);
-			
-			// MAKE SURE IT'S A REAL & GOOD NUMBER
-
-			if (isNaN(guess)) {
-			alert("Please only enter numeric digits. No letters. No decimals. Thanks!");
-			}
-			else if (guess % 1 != 0) {
-			alert("Please no numbers with decimals. Thanks!");
-			}
-			else if (guess > 100) {
-				alert("Please choos a number between 1-100. Thanks!");
-			}
-			
-			// TELL USER HOW CLOSE THEY ARE
-
-			else if (guess > number || guess < number) {
+	/*--- COMPARE USER'S GUESS WITH NUMBER ---*/
+	var compareToChosen = function (text) {
+		var diff = Math.abs(guess - number);
+		var oldGuess = +$("#guessList li").last().text();
+		var oldDiff = Math.abs(oldGuess - number);
+		if (guess > number || guess < number) {
+			if (numGuesses == 0) {
 				if (diff >= 50) {
-					changeHeader("Ice cold! Guess again.", "#0EDBEC");
+					changeHeader("Ice cold!", "#0EDBEC");
 				}
 				else if (diff >= 30 ) {
 					changeHeader("Cold... Keep trying.", "#0E81EC");
 				}
 				else if (diff >= 20) {
-					changeHeader("Warm... Keep trying.", "#C00EEC");
+					changeHeader("Warm...", "#C00EEC");
 				}
 				else if (diff >= 10) {
-					changeHeader("Hot! Almost there!", "#EC0E4C");
+					changeHeader("Hot! Getting close...", "#EC0E4C");
 				}
 				else {
-					changeHeader("Very hot! Guess again!", "#EC0E0E");
-				}
+					changeHeader("Very hot! Almost there!!", "#EC0E0E");
+				};
 			}
 			else {
-				changeHeader("Congrats! You guessed it!", "#27C200");
-			}
-
-			$("#guessList").prepend("<li>" + guess + "</li>");
-			$("#userGuess").val('').focusout();
-		});
+				if (diff < oldDiff) {
+					changeHeader("Warmer...", "#C00EEC");
+				}
+				else {
+					changeHeader("Colder...", "#0EDBEC");
+				};
+			};
+		}
+		else {
+			changeHeader("Congrats! You guessed it!", "#27C200");
+			setTimeout(resetGame,2000);
+		};
 	};
-  	newGame();
 
+	/*--- RESET GAME IF USER CLICKS NEW GAME ---*/
   	var resetGame = function() {
 		$("#count").text("0");
-		$("#feedback").text("Make your Guess!");
-  		$("h2").css("background", "#B36604");
-  		$("guessList").empty;
+  		$(".guessBox").empty();
+  		numGuesses = 0;
+  		resetHeader();
+		clearForm();
+		chooseNumber();
   	};
 
 	$(".new").click(function() {
-		newGame();
 		resetGame();
 	});
 });
 
-// NEED TO CLEAN OUT PREVIOUS GAME AS PART OF NEW GAME
-
-// GUESS A NUMBER FUNCTION
-
-
-
-// CLICKING NEW GAME BUTTON
-// Should actually start a new game
-
-
-
-
-
-// You will need to write code that
-// ensures that the user has supplied a numeric input between 1 and 100
-
-// COMPARE USERS GUESS TO THE NUMBER AND GIVE FEEDBACK
-// Feedback about the guess should appear in div#feedback.
-// By default, when the page loads, the text in this field is set to
-// “Make Your Guess!”
-
-
-// TRACK GUESSES
-// The game should track how many guesses the user has made.
-// Feedback about this should appear in span#count
-// (which defaults to 0, when the page loads).
-
-// LIST GUESSED NUMBERS
-// The game should also supply users with a list of the numbers
-// they have guessed so far. We’ve set up the CSS for this game
-// in such a way that you can simply add each guessed number as an
-// ul#guessList.
-
+// GET RID OF MESSAGE AFTER A FEW SECONDS
 
 // ADVANCED FEATURE - RELATIONAL FEEDBACK
 // you can write code that provides users with feedback about their
