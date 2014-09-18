@@ -25,7 +25,7 @@ $(document).ready(function(){
 
   	var resetHeader = function () {
 	  	$("#feedback").text("Make your Guess!");
-	  	$("h2").css({background: "#B36604"}, 1000, function(){});  		
+	  	$("h2").css({background: "#B36604"}, 2000, function(){});  		
   	};
 
 	/*--- APP CHOOSES A NUMBER BETWEEN 1-100 ---*/
@@ -123,8 +123,8 @@ $(document).ready(function(){
 			};
 		}
 		else {
-			changeHeader("Congrats! You guessed it!", "#27C200");
-			setTimeout(resetGame,2000);
+			$("#feedback").text("Congrats! You guessed it!");
+  			$("h2").css("background", "#27C200");
 		};
 	};
 
